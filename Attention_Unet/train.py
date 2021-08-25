@@ -66,9 +66,9 @@ def train(path_images, path_labels):
         epochs=25,
         # callbacks=cb_list,
     )
-    # utils.plot_learning_curves(
-    #     history, "segmentation_attention_unet", "loss"
-    # )
+    utils.plot_learning_curves(
+        history, "segmentation_attention_unet", "loss"
+    )
 
 
 if __name__ == "__main__":
