@@ -41,7 +41,7 @@ def get_datasets(path_img, path_label):
         img_path_list, label_path_list, test_size=0.2, random_state=42
     )
 
-    dataset_train = data.Dataset(16, 512, img_train, img_val)
+    dataset_train = data.Dataset(16, 512, img_train, label_train)
     dataset_val = data.Dataset(2, 512, img_val, label_val)
     return dataset_train, dataset_val
 
@@ -59,7 +59,7 @@ def train(path_images, path_labels):
 
     model_seg = get_model(True)
     dataset_train, dataset_val = get_datasets(path_images, path_labels)
-    # print(dataset_train[0])  # issue here, check labels value
+    print(dataset_train[0])  # issue here, check labels value
     history = model_seg.fit(
         dataset_train,
         validation_data=dataset_val,
