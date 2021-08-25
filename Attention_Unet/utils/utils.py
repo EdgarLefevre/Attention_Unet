@@ -61,6 +61,7 @@ def plot_learning_curves(history, name, metric, path="plots/"):
     ax2.legend()
 
     fig.savefig(path + name + ".png")
+    plt.close(fig)
 
 
 def print_red(skk):
@@ -276,3 +277,23 @@ def weighted_cross_entropy(y_true, y_pred):
     )
 
     return K.mean(tf.multiply(weight, entropy), axis=-1)
+
+
+def visualize(imgs, pred):
+    fig = plt.figure(figsize=(15, 10))
+    columns = 2
+    rows = 5  # nb images
+    ax = []  # loop around here to plot more images
+    i = 0
+    for j, img in enumerate(imgs):
+        ax.append(fig.add_subplot(rows, columns, i + 1))
+        ax[-1].set_title("Input")
+        plt.imshow(img, cmap="gray")
+        ax.append(fig.add_subplot(rows, columns, i + 2))
+        ax[-1].set_title("Mask")
+        plt.imshow(pred[j], cmap="gray")
+        i += 2
+        if i >= 15:
+            break
+    plt.show()
+    # plt.close()
