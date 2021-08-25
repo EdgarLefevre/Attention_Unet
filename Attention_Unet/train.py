@@ -41,8 +41,8 @@ def get_datasets(path_img, path_label):
         img_path_list, label_path_list, test_size=0.2, random_state=42
     )
 
-    dataset_train = data.Dataset(16, 128, img_train, img_val)
-    dataset_val = data.Dataset(2, 128, img_val, label_val)
+    dataset_train = data.Dataset(16, 512, img_train, img_val)
+    dataset_val = data.Dataset(2, 512, img_val, label_val)
     return dataset_train, dataset_val
 
 
