@@ -80,13 +80,9 @@ def elastic_transform(image, alpha, sigma, alpha_affine, random_state=None):
     ).reshape(shape)
 
 
-def elastic_transform_wrapped(img_path, mask_path, tiff=True):
-    if tiff:
-        im = io.imread(PATH_IMG + img_path, plugin="tifffile")
-        im_mask = io.imread(PATH_MASK + mask_path, plugin="tifffile")
-    else:
-        im = io.imread(PATH_IMG + img_path)
-        im_mask = io.imread(PATH_MASK + mask_path)
+def elastic_transform_wrapped(img_path, mask_path):
+    im = io.imread(PATH_IMG + img_path)
+    im_mask = io.imread(PATH_MASK + mask_path, plugin="tifffile")
     im_merge = np.concatenate((im[..., None], im_mask[..., None]), axis=2)
 
     # im_merge_t = elastic_transform(im_merge, im_merge.shape[1] * 3, im_merge.shape[1] * 0.09, im_merge.shape[1] * 0.09)
@@ -105,14 +101,14 @@ def elastic_transform_wrapped(img_path, mask_path, tiff=True):
 
 if __name__ == "__main__":
     # DA for seg
-    list_img = list_files(PATH_IMG)
-    list_mask = list_files(PATH_MASK)
-
-    for i, img in enumerate(list_img):
-        print(img)
-        mask = list_mask[i]
-        rotate_img(PATH_IMG, img)
-        rotate_img(PATH_MASK, mask)
+    # list_img = list_files(PATH_IMG)
+    # list_mask = list_files(PATH_MASK)
+    #
+    # for i, img in enumerate(list_img):
+    #     print(img)
+    #     mask = list_mask[i]
+    #     rotate_img(PATH_IMG, img)
+    #     rotate_img(PATH_MASK, mask)
 
     list_img = list_files(PATH_IMG)
     list_mask = list_files(PATH_MASK)
@@ -120,4 +116,4 @@ if __name__ == "__main__":
     for i, img in enumerate(list_img):
         print("transform " + img)
         mask = list_mask[i]
-        elastic_transform_wrapped(img, mask, tiff=True)
+        elastic_transform_wrapped(img, mask)

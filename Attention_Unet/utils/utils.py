@@ -5,6 +5,7 @@ import argparse
 import math
 import os
 import re
+import random
 
 import matplotlib.pyplot as plt
 import skimage.measure as measure
@@ -21,7 +22,7 @@ def list_files_path(path):
     :return: A list containing all files in the folder
     :rtype: List
     """
-    return [path + f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
+    return sorted_alphanumeric([path + f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))])
 
 
 def plot_learning_curves(history, name, metric, path="plots/"):
@@ -63,6 +64,25 @@ def plot_learning_curves(history, name, metric, path="plots/"):
     fig.savefig(path + name + ".png")
     plt.close(fig)
 
+
+def shuffle_lists(lista, listb, seed=42):
+    """
+    Shuffle two list with the same seed.
+
+    :param lista: List of elements
+    :type lista: List
+    :param listb: List of elements
+    :type listb: List
+    :param seed: Seed number
+    :type seed: int
+    :return: lista and listb shuffled
+    :rtype: (List, List)
+    """
+    random.seed(seed)
+    random.shuffle(lista)
+    random.seed(seed)
+    random.shuffle(listb)
+    return lista, listb
 
 def print_red(skk):
     """

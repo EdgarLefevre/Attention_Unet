@@ -39,6 +39,8 @@ def get_model(att):
 def get_datasets(path_img, path_label):
     img_path_list = utils.list_files_path(path_img)
     label_path_list = utils.list_files_path(path_label)
+    img_path_list, label_path_list = utils.shuffle_lists(img_path_list, label_path_list)
+
     # not good if we need to do metrics
     img_train, img_val, label_train, label_val = sk.train_test_split(
         img_path_list, label_path_list, test_size=0.2, random_state=42
@@ -47,6 +49,7 @@ def get_datasets(path_img, path_label):
     dataset_train = data.Dataset(16, 512, img_train, label_train)
     dataset_val = data.Dataset(2, 512, img_val, label_val)
     return dataset_train, dataset_val
+
 
 def create_pred_dataset(path_img):
     img = io.imread(path_img).astype(np.uint8)
@@ -62,11 +65,11 @@ def pred_(model, path_list):
     for path in path_list:
         img = create_pred_dataset(path)
         res = model.predict(img)
-        print(np.amax(res))
-        img_list.append(img * 255)
+        img_list.append(img.reshape(512, 512) * 255)
         pred_list.append((res > 0.5).astype(np.uint8).reshape(512, 512) * 255)
         # pred_list.append(res.astype(np.uint8).reshape(512, 512) * 255)
     return img_list, pred_list
+
 
 def pred(model):
     base_path = "/home/edgar/Documents/Datasets/JB/supervised/test/"
@@ -104,7 +107,6 @@ def train(path_images, path_labels):
         history, "segmentation_attention_unet", "loss"
     )
     pred(model_seg)
-
 
 
 if __name__ == "__main__":
