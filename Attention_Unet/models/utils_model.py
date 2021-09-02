@@ -61,7 +61,7 @@ def block_up(inputs, conc, filters, drop, w_decay=0.0001, kernel_size=3, name=""
     for i in range(len(conc)):
         if attention:
             gat = gating_signal(inputs, filters)
-            att = attention_block(conc[i], gat, filters)
+            att = attention_block(conc[i], gat, filters, name=name+"_att")
             x = layers.concatenate([x, conc[i], att], name=name + "_concatenate" + str(i))
         else:
             x = layers.concatenate([x, conc[i]], name=name + "_concatenate" + str(i))
@@ -103,7 +103,7 @@ def gating_signal(input, out_size, batch_norm=False):
     return x
 
 
-def attention_block(x, gating, inter_shape):
+def attention_block(x, gating, inter_shape, name):
     """
     From https://towardsdatascience.com/a-detailed-explanation-of-the-attention-u-net-b371a5590831 ;
     did some adaptation, not sure for now if it's working
@@ -118,6 +118,6 @@ def attention_block(x, gating, inter_shape):
     act_xg = layers.Activation("relu")(concat_xg)
     psi = layers.Conv2D(1, (1, 1), padding="same")(act_xg)  # 8,8,1
     sigmoid_xg = layers.Activation("sigmoid")(psi)
-    upsample_psi = layers.UpSampling2D(size=(2, 2))(sigmoid_xg)  # 16,16,1
+    upsample_psi = layers.UpSampling2D(size=(2, 2), name=name)(sigmoid_xg)  # 16,16,1
     y = layers.multiply([upsample_psi, x])  # 16,16,32
     return y

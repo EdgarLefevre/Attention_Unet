@@ -16,3 +16,8 @@ conda env create -f env.yml
 ```shell
 python -m Attention_Unet.train
 ```
+
+## TODOs
+
+ - [ ] bug unet ++ with attention (layer names)
+ - [ ] postprocessing

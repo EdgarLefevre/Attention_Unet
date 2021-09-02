@@ -1,6 +1,27 @@
 import numpy as np
 import tensorflow.keras as keras
 import tensorflow as tf
+import skimage.exposure as exposure
+
+
+def contrast_and_reshape(img, size=512):
+    """
+    For some mice, we need to readjust the contrast.
+
+    :param img: Slices of the mouse we want to segment
+    :type img: np.array
+    :param size: Size of the images (we assume images are squares)
+    :type size: int
+    :return: Images list with readjusted contrast
+    :rtype: np.array
+
+    .. warning:
+       If the contrast pf the mouse should not be readjusted,
+        the network will fail prediction.
+       Same if the image should be contrasted and you do not run it.
+    """
+    img_adapteq = exposure.equalize_adapthist(img, clip_limit=0.03)
+    return np.array(img_adapteq)
 
 
 class Dataset(keras.utils.Sequence):
@@ -9,12 +30,16 @@ class Dataset(keras.utils.Sequence):
         batch_size,
         img_size,
         input_img_paths,
-        label_img_paths
+        label_img_paths,
+        contrast=True
     ):
         self.batch_size = batch_size
         self.img_size = img_size
         self.input_img_paths = input_img_paths
         self.label_img_paths = label_img_paths
+        self.contrast = contrast
+        assert len(input_img_paths) == len(label_img_paths)
+        print("Nb of images : {}".format(len(input_img_paths)))
 
     def __len__(self):
         return len(self.input_img_paths) // self.batch_size
@@ -40,6 +65,8 @@ class Dataset(keras.utils.Sequence):
                 )
                 / 255
             )
+            if self.contrast:
+                img = contrast_and_reshape(img)
             x[j] = np.expand_dims(img, 2)
 
         y = np.zeros(

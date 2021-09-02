@@ -19,5 +19,5 @@ def unet(input_shape, filters=16, drop_r=0.2, attention=False):
     u1 = utils_model.block_up(u2, [c1], filters=filters, drop=drop_r, name="block8", attention=attention)
 
     outputs = layers.Conv2D(1, (1, 1), activation="sigmoid")(u1)
-    model = keras.models.Model(inputs=[inputs], outputs=[outputs])
+    model = keras.models.Model(inputs=[inputs], outputs=[outputs])  # add att en output pour plot les att maps
     return model

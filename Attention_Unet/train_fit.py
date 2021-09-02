@@ -27,7 +27,7 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
 
 def get_model(att):
     model_seg = unet.unet((512, 512, 1), filters=8, drop_r=0.5, attention=att)
-    optim = tf.keras.optimizers.Adam(lr=0.001)
+    optim = tf.keras.optimizers.Adam(lr=0.0001)
     loss_fn = "binary_crossentropy"
     model_seg.compile(
         loss=loss_fn,
@@ -53,7 +53,6 @@ def get_datasets(path_img, path_label):
 
 def create_pred_dataset(path_img):
     img = io.imread(path_img).astype(np.uint8)
-    # img = transform.resize(img, (len(img), 128, 128), anti_aliasing=True)
     img = np.array(img) / 255
     img = np.array(img).reshape(-1, 512, 512, 1)
     return img
@@ -67,7 +66,6 @@ def pred_(model, path_list):
         res = model.predict(img)
         img_list.append(img.reshape(512, 512) * 255)
         pred_list.append((res > 0.5).astype(np.uint8).reshape(512, 512) * 255)
-        # pred_list.append(res.astype(np.uint8).reshape(512, 512) * 255)
     return img_list, pred_list
 
 
@@ -85,23 +83,12 @@ def pred(model):
 
 
 def train(path_images, path_labels):
-    # earlystopper = keras.callbacks.EarlyStopping(
-    #     monitor="val_" + metric,
-    #     patience=args["patience"],
-    #     verbose=1,
-    #     min_delta=0.001,
-    #     restore_best_weights=True,
-    #     mode="min",
-    # )
-    # cb_list = [earlystopper, utils.CosLRDecay(args["n_epochs"], args["lr"]), checkpoint]
-
     model_seg = get_model(True)
     dataset_train, dataset_val = get_datasets(path_images, path_labels)
     history = model_seg.fit(
         dataset_train,
         validation_data=dataset_val,
-        epochs=100,
-        # callbacks=cb_list,
+        epochs=200,
     )
     utils.plot_learning_curves(
         history, "segmentation_attention_unet", "loss"

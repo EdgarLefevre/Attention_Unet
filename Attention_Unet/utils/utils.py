@@ -84,6 +84,7 @@ def shuffle_lists(lista, listb, seed=42):
     random.shuffle(listb)
     return lista, listb
 
+
 def print_red(skk):
     """
     Print in red.
@@ -258,9 +259,9 @@ class CosLRDecay(tf.keras.callbacks.Callback):
         At the beginning of each epoch, process a new learning rate.
         """
         self.model.optimizer.lr = (
-            0.5
-            * (1 + math.cos(epoch * math.pi / self.nb_epochs))
-            * self.model.optimizer.lr
+                0.5
+                * (1 + math.cos(epoch * math.pi / self.nb_epochs))
+                * self.model.optimizer.lr
         )
         if self.model.optimizer.lr == 0.0:
             self.model.optimizer.lr = 1e-10
@@ -317,3 +318,14 @@ def visualize(imgs, pred):
             break
     plt.show()
     # plt.close()
+
+
+def learning_curves(train, val):
+    fig, ax = plt.subplots(1, figsize=(12, 8))
+    fig.suptitle("Training Curves")
+    ax.plot(train, label="Entraînement")
+    ax.plot(val, label="Validation")
+    ax.set_ylabel("Loss", fontsize=14)
+    ax.set_xlabel("Epoch", fontsize=14)
+    fig.savefig("plots/plot.png")
+    plt.close(fig)
