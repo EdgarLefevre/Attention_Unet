@@ -170,16 +170,16 @@ def _train(epochs, dataset, dataset_val, model, optimizer):
 
 
 def train(path_images, path_labels):
-    model = unet.unet((512, 512, 1), filters=8, drop_r=0.2, attention=False)
+    model = unet.unet((512, 512, 1), filters=8, drop_r=0.2, attention=True)
     dataset_train, dataset_val = get_datasets(path_images, path_labels)
-    _train(5,
+    _train(200,
            dataset_train,
            dataset_val,
            model=model,
            optimizer=tf.keras.optimizers.Adam(lr=0.002)
            )
     pred(model)
-    # viz_att_map(model)
+    viz_att_map(model)
 
 
 def plot_att_map(img, map):
@@ -193,6 +193,7 @@ def plot_att_map(img, map):
     ax.append(fig.add_subplot(rows, columns, 2))
     ax[-1].set_title("Attention map")
     plt.imshow(map * 255)
+    plt.colorbar()
     plt.show()
 
 
