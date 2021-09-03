@@ -316,8 +316,9 @@ def visualize(imgs, pred):
         i += 2
         if i >= 15:
             break
-    plt.show()
-    # plt.close()
+    # plt.show()
+    fig.savefig("plots/prediction.png")
+    plt.close(fig)
 
 
 def learning_curves(train, val):

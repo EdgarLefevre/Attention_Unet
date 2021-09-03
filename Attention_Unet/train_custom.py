@@ -38,6 +38,8 @@ widgets = [
     ") ",
 ]
 
+BASE_PATH = "/home/edgar/Documents/Datasets/JB/supervised/"
+
 
 def get_model(att):
     model_seg = unet.unet((512, 512, 1), filters=16, drop_r=0.5, attention=att)
@@ -84,7 +86,7 @@ def pred_(model, path_list):
 
 
 def pred(model):
-    base_path = "/home/edgar/Documents/Datasets/JB/supervised/test/"
+    base_path = BASE_PATH + "test/"
     pathlist = [
         base_path + "Spheroid_D31000_02_w2soSPIM-405_135_5.png",
         base_path + "Spheroid_D31000_02_w2soSPIM-405_135_6.png",
@@ -194,12 +196,15 @@ def plot_att_map(img, map):
     ax[-1].set_title("Attention map")
     plt.imshow(map * 255)
     plt.colorbar()
-    plt.show()
+    # plt.show()
+    fig.savefig("plots/att_map.png")
+    plt.close(fig)
+
 
 
 def viz_att_map(model):
     image = np.array(
-        io.imread("/home/edgar/Documents/Datasets/JB/supervised/test/Spheroid_D31000_02_w2soSPIM-405_135_6.png")) / 255
+        io.imread(BASE_PATH + "test/Spheroid_D31000_02_w2soSPIM-405_135_6.png")) / 255
     image = data.contrast_and_reshape(image)
     image = image.reshape(1, 512, 512, 1)
     output = model.get_layer("block7_att").output
@@ -211,6 +216,6 @@ def viz_att_map(model):
 if __name__ == "__main__":
     print(tf.__version__)
     train(
-        path_images="/home/edgar/Documents/Datasets/JB/supervised/imgs/",
-        path_labels="/home/edgar/Documents/Datasets/JB/supervised/labels/",
+        path_images=BASE_PATH + "imgs/",
+        path_labels=BASE_PATH + "labels/",
     )
