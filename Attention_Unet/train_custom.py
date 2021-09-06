@@ -129,7 +129,7 @@ def run_epoch(
         optim,
         train=True,
 ):
-    loss_epoch = 0
+    loss_epoch = []
     with progressbar.ProgressBar(max_value=len(dataset), widgets=widgets) as bar:
         for i, (x, w) in enumerate(dataset):
             bar.update(i)
@@ -139,7 +139,7 @@ def run_epoch(
                 optim,
                 train
             )
-            loss_epoch += loss_step
+            loss_epoch.append(loss_step)
     return loss_epoch
 
 
@@ -163,7 +163,7 @@ def _train(epochs, dataset, dataset_val, model, optimizer):
         )
         utils.print_gre(
             "\nEpoch {} : \n\tTraining loss : {}\n\tValidation loss : {}\n".format(
-                epoch + 1, loss_train.numpy().mean(), loss_val.numpy().mean()
+                epoch + 1, np.array(loss_train).mean(), np.array(loss_val).mean()
             )
         )
         loss_t.append(loss_train)
@@ -174,7 +174,7 @@ def _train(epochs, dataset, dataset_val, model, optimizer):
 def train(path_images, path_labels):
     model = unet.unet((512, 512, 1), filters=8, drop_r=0.2, attention=True)
     dataset_train, dataset_val = get_datasets(path_images, path_labels)
-    _train(200,
+    _train(10,
            dataset_train,
            dataset_val,
            model=model,

@@ -87,7 +87,6 @@ def block_up(inputs, conc, filters, drop, w_decay=0.0001, kernel_size=3, name=""
     return x
 
 
-
 def gating_signal(input, out_size, batch_norm=False):
     """
     resize the down layer feature map into the same dimension as the up layer feature map
@@ -106,7 +105,7 @@ def gating_signal(input, out_size, batch_norm=False):
 def attention_block(x, gating, inter_shape, name):
     """
     From https://towardsdatascience.com/a-detailed-explanation-of-the-attention-u-net-b371a5590831 ;
-    did some adaptation, not sure for now if it's working
+    did some adaptation
     """
     theta_x = layers.Conv2D(inter_shape, kernel_size=1, strides=2, padding="same")(
         x
