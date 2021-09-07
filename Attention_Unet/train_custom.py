@@ -41,15 +41,6 @@ widgets = [
 # BASE_PATH = "/home/edgar/Documents/Datasets/JB/supervised/"
 BASE_PATH = "/home/edgar/Documents/Datasets/Sim_cell_seg/"
 
-def get_model(att):
-    model_seg = unet.unet((512, 512, 1), filters=16, drop_r=0.5, attention=att)
-    optim = tf.keras.optimizers.Adam(lr=0.0001)
-    model_seg.compile(
-        loss="bianry_crossentropy",
-        optimizer=optim,
-    )
-    return model_seg
-
 
 def get_datasets(path_img, path_label):
     img_path_list = utils.list_files_path(path_img)
@@ -69,7 +60,7 @@ def get_datasets(path_img, path_label):
 def create_pred_dataset(path_img):
     img = io.imread(path_img).astype(np.uint8)
     img = np.array(img) / 255
-    img = data.contrast_and_reshape(img)
+    # img = data.contrast_and_reshape(img)
     img = np.array(img).reshape(-1, 512, 512, 1)
     return img
 
