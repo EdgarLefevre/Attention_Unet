@@ -1,6 +1,7 @@
 import numpy as np
 import tensorflow.keras as keras
 import tensorflow as tf
+import skimage.io as io
 import skimage.exposure as exposure
 
 
@@ -55,34 +56,42 @@ class Dataset(keras.utils.Sequence):
             (self.batch_size, self.img_size, self.img_size, 1), dtype="float32"
         )
         for j, path in enumerate(batch_input_img_paths):
-            img = (
-                np.array(
-                    keras.preprocessing.image.load_img(
-                        path,
-                        color_mode="grayscale",
-                        target_size=(self.img_size, self.img_size),
+            try:
+                img = (
+                    np.array(
+                        keras.preprocessing.image.load_img(
+                            path,
+                            color_mode="grayscale",
+                            target_size=(self.img_size, self.img_size),
+                        )
                     )
+                    / 255
                 )
-                / 255
-            )
-            if self.contrast:
-                img = contrast_and_reshape(img)
+                # img = np.array(io.imread(path)) / 255
+            except Exception as e:
+                print(path)
+            # if self.contrast:
+            #     img = contrast_and_reshape(img)
             x[j] = np.expand_dims(img, 2)
 
         y = np.zeros(
             (self.batch_size, self.img_size, self.img_size, 1), dtype="float32"
         )
         for k, path_lab in enumerate(batch_label_img_paths):
-            img = (
-                    np.array(
-                        keras.preprocessing.image.load_img(
-                            path_lab,
-                            color_mode="grayscale",
-                            target_size=(self.img_size, self.img_size),
+            try:
+                img = (
+                        np.array(
+                            keras.preprocessing.image.load_img(
+                                path_lab,
+                                color_mode="grayscale",
+                                target_size=(self.img_size, self.img_size),
+                            )
                         )
-                    )
-                    / 255
-            )
+                        / 255
+                )
+                # img = np.array(io.imread(path)) / 255
+            except Exception as e:
+                print(path)
             y[k] = np.expand_dims(img, 2)
         return tf.constant(x), tf.constant(y)
 

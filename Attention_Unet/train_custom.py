@@ -38,8 +38,8 @@ widgets = [
     ") ",
 ]
 
-BASE_PATH = "/home/edgar/Documents/Datasets/JB/supervised/"
-
+# BASE_PATH = "/home/edgar/Documents/Datasets/JB/supervised/"
+BASE_PATH = "/home/edgar/Documents/Datasets/Sim_cell_seg/"
 
 def get_model(att):
     model_seg = unet.unet((512, 512, 1), filters=16, drop_r=0.5, attention=att)
@@ -87,12 +87,19 @@ def pred_(model, path_list):
 
 def pred(model):
     base_path = BASE_PATH + "test/"
+    # pathlist = [
+    #     base_path + "Spheroid_D31000_02_w2soSPIM-405_135_5.png",
+    #     base_path + "Spheroid_D31000_02_w2soSPIM-405_135_6.png",
+    #     base_path + "Spheroid_D31000_02_w2soSPIM-405_135_9.png",
+    #     base_path + "Spheroid_D31000_02_w2soSPIM-405_136_5.png",
+    #     base_path + "Spheroid_D31000_02_w2soSPIM-405_136_9.png"
+    # ]
     pathlist = [
-        base_path + "Spheroid_D31000_02_w2soSPIM-405_135_5.png",
-        base_path + "Spheroid_D31000_02_w2soSPIM-405_135_6.png",
-        base_path + "Spheroid_D31000_02_w2soSPIM-405_135_9.png",
-        base_path + "Spheroid_D31000_02_w2soSPIM-405_136_5.png",
-        base_path + "Spheroid_D31000_02_w2soSPIM-405_136_9.png"
+        base_path + "0.png",
+        base_path + "1.png",
+        base_path + "2.png",
+        base_path + "3.png",
+        base_path + "4.png"
     ]
     imgs, preds = pred_(model, pathlist)
     utils.visualize(imgs, preds)
@@ -129,7 +136,7 @@ def run_epoch(
         optim,
         train=True,
 ):
-    loss_epoch = []
+    loss_epoch = 0
     with progressbar.ProgressBar(max_value=len(dataset), widgets=widgets) as bar:
         for i, (x, w) in enumerate(dataset):
             bar.update(i)
@@ -139,7 +146,7 @@ def run_epoch(
                 optim,
                 train
             )
-            loss_epoch.append(loss_step)
+            loss_epoch += loss_step
     return loss_epoch
 
 
@@ -168,13 +175,13 @@ def _train(epochs, dataset, dataset_val, model, optimizer):
         )
         loss_t.append(loss_train)
         loss_v.append(loss_val)
-        utils.learning_curves(loss_t, loss_v)
+    utils.learning_curves(loss_t, loss_v)
 
 
 def train(path_images, path_labels):
     model = unet.unet((512, 512, 1), filters=8, drop_r=0.2, attention=True)
     dataset_train, dataset_val = get_datasets(path_images, path_labels)
-    _train(10,
+    _train(50,
            dataset_train,
            dataset_val,
            model=model,
@@ -203,9 +210,11 @@ def plot_att_map(img, map):
 
 
 def viz_att_map(model):
+    # image = np.array(
+    #     io.imread(BASE_PATH + "test/Spheroid_D31000_02_w2soSPIM-405_135_6.png")) / 255
     image = np.array(
-        io.imread(BASE_PATH + "test/Spheroid_D31000_02_w2soSPIM-405_135_6.png")) / 255
-    image = data.contrast_and_reshape(image)
+        io.imread(BASE_PATH + "test/2.png")) / 255
+    # image = data.contrast_and_reshape(image)
     image = image.reshape(1, 512, 512, 1)
     output = model.get_layer("block7_att").output
     intermediate_model = tf.keras.models.Model(inputs=model.inputs, outputs=output)
@@ -214,7 +223,7 @@ def viz_att_map(model):
 
 
 if __name__ == "__main__":
-    print(tf.__version__)
+    print("Tensorflow version : ", tf.__version__)
     train(
         path_images=BASE_PATH + "imgs/",
         path_labels=BASE_PATH + "labels/",
