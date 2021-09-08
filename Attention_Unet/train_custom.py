@@ -42,7 +42,7 @@ widgets = [
 BASE_PATH = "/home/edgar/Documents/Datasets/Sim_cell_seg/"
 
 
-def get_datasets(path_img, path_label):
+def get_datasets(path_img, path_label, config):
     img_path_list = utils.list_files_path(path_img)
     label_path_list = utils.list_files_path(path_label)
     img_path_list, label_path_list = utils.shuffle_lists(img_path_list, label_path_list)
@@ -52,8 +52,8 @@ def get_datasets(path_img, path_label):
         img_path_list, label_path_list, test_size=0.2, random_state=42
     )
 
-    dataset_train = data.Dataset(16, 512, img_train, label_train)
-    dataset_val = data.Dataset(16, 512, img_val, label_val)
+    dataset_train = data.Dataset(config.batch_size, config.size, img_train, label_train)
+    dataset_val = data.Dataset(config.batch_size, config.size, img_val, label_val)
     return dataset_train, dataset_val
 
 
@@ -169,14 +169,14 @@ def _train(epochs, dataset, dataset_val, model, optimizer):
     utils.learning_curves(loss_t, loss_v)
 
 
-def train(path_images, path_labels):
-    model = unet.unet((512, 512, 1), filters=8, drop_r=0.2, attention=True)
-    dataset_train, dataset_val = get_datasets(path_images, path_labels)
-    _train(50,
+def train(path_images, path_labels, config):
+    model = unet.unet((config.size, config.size, 1), filters=config.filters, drop_r=config.drop_r, attention=config.att)
+    dataset_train, dataset_val = get_datasets(path_images, path_labels, config)
+    _train(config.epochs,
            dataset_train,
            dataset_val,
            model=model,
-           optimizer=tf.keras.optimizers.Adam(lr=0.002)
+           optimizer=tf.keras.optimizers.Adam(lr=config.lr)
            )
     pred(model)
     viz_att_map(model)
@@ -215,7 +215,9 @@ def viz_att_map(model):
 
 if __name__ == "__main__":
     print("Tensorflow version : ", tf.__version__)
+    args = utils.get_args()
     train(
         path_images=BASE_PATH + "imgs/",
         path_labels=BASE_PATH + "labels/",
+        config=args
     )

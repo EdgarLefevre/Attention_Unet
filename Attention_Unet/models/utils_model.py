@@ -62,7 +62,8 @@ def block_up(inputs, conc, filters, drop, w_decay=0.0001, kernel_size=3, name=""
         if attention:
             gat = gating_signal(inputs, filters)
             att = attention_block(conc[i], gat, filters, name=name+"_att")
-            x = layers.concatenate([x, conc[i], att], name=name + "_concatenate" + str(i))
+            # x = layers.concatenate([x, conc[i], att], name=name + "_concatenate" + str(i))
+            x = layers.concatenate([x, att], name=name + "_concatenate" + str(i))
         else:
             x = layers.concatenate([x, conc[i]], name=name + "_concatenate" + str(i))
     x = layers.Conv2D(
