@@ -17,6 +17,14 @@ conda env create -f env.yml
 python -m Attention_Unet.train
 ```
 
+## Results 
+
+Attention map :
+![Attention map](./data/att_map.png)
+
+Prediction :
+![Prediction](./data/prediction_wo_att.png)
+
 ## TODOs
 
  - [ ] bug unet ++ with attention (layer names)

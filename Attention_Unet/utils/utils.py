@@ -119,101 +119,6 @@ def sorted_alphanumeric(data):
     return sorted(data, key=alphanum_key)
 
 
-def border_detected(dataset, k, seg, path_result, name_folder):
-    """
-    Draw mask borders on image and save it.
-
-    :param dataset: Image you want to draw on
-    :type dataset: np.array
-    :param k: Index of the image
-    :type k: int
-    :param seg: Mask
-    :type seg: np.array
-    :param path_result: path where you want to save images
-    :type path_result: str
-    :param name_folder: Folder in which you want to save images.
-    :type name_folder: str
-    """
-    cell_contours = measure.find_contours(seg[k], 0.8)
-    fig, ax = plt.subplots(ncols=1, nrows=1, figsize=(10, 10))
-    for contour in cell_contours:
-        ax.plot(contour[:, 1], contour[:, 0], linewidth=1, color="red")
-    plt.xlim((0, 128))
-    plt.ylim((128, 0))
-    plt.imshow(dataset[k], cmap="gray")
-    plt.savefig(path_result + str(name_folder) + "/" + str(k) + ".png")
-    plt.close(fig)
-
-
-def get_args():
-    """
-    Argument parser.
-
-    :return: Object containing all the parameters needed to train a model
-    :rtype: Dict
-    """
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--n_epochs", type=int, default=200, help="number of epochs of training"
-    )
-    parser.add_argument(
-        "--batch_size", type=int, default=300, help="size of the batches"
-    )
-    parser.add_argument("--lr", type=float, default=0.001, help="adam: learning rate")
-    parser.add_argument(
-        "--model_name",
-        type=str,
-        default="small++",
-        help="Name of the model you want to train",
-        choices=["small++", "unet"],
-    )
-    parser.add_argument(
-        "--meta", dest="meta", action="store_true", help="If flag, segment metas"
-    )
-    parser.set_defaults(meta=False)
-    parser.add_argument(
-        "--weighted",
-        dest="weighted",
-        action="store_true",
-        help="If flag, use weighted crossentropy",
-    )
-    parser.set_defaults(weighted=False)
-    parser.add_argument(
-        "--size", type=int, default=128, help="Size of the image, one number"
-    )
-    parser.add_argument(
-        "--drop_r", type=float, default=0.2, help="Size of the image, one number"
-    )
-    parser.add_argument(
-        "--filters", type=int, default=16, help="Size of the image, one number"
-    )
-    parser.add_argument("--w1", type=int, default=2, help="weight inside")
-    parser.add_argument("--w2", type=int, default=4, help="Weight border")
-    parser.add_argument(
-        "--patience", type=int, default=10, help="Set patience value for early stopper"
-    )
-    args = parser.parse_args()
-    print_red(args)
-    return args
-
-
-class PrintLR(tf.keras.callbacks.Callback):
-    """
-    Callback used to print learning rate at each epoch.
-    """
-
-    def on_epoch_begin(self, epoch, logs=None):
-        """
-        At the beginning of each epoch, print the current learning rate.
-
-        """
-        print_gre(
-            "\nLearning rate for epoch {} is {}".format(
-                epoch + 1, self.model.optimizer.lr.numpy()
-            )
-        )
-
-
 class LRDecay(tf.keras.callbacks.Callback):
     """
     Callback used to linearly reduce the learning rate.
@@ -268,38 +173,6 @@ class CosLRDecay(tf.keras.callbacks.Callback):
         print_gre("\nLearning rate is {}".format(self.model.optimizer.lr.numpy()))
 
 
-def weighted_cross_entropy(y_true, y_pred):
-    """
-    -- Fonction de coût pondéré --
-    :param y_true: vrai valeur de y (label)
-    :param y_pred: valeur prédite de y par le modèle
-    :return: valeur de la fonction de cout d'entropie croisée pondérée
-    """
-    try:
-        [seg, weight] = tf.unstack(y_true, 2, axis=3)
-
-        seg = tf.expand_dims(seg, -1)
-        weight = tf.expand_dims(weight, -1)
-    except Exception:
-        pass
-
-    epsilon = tf.convert_to_tensor(10e-8, y_pred.dtype.base_dtype)
-    y_pred = tf.clip_by_value(y_pred, epsilon, 1 - epsilon)
-    y_pred = tf.math.log(y_pred / (1 - y_pred))
-
-    zeros = tf.zeros_like(y_pred, dtype=y_pred.dtype)  # array_ops
-    cond = y_pred >= zeros
-    relu_logits = tf.where(cond, y_pred, zeros)
-    neg_abs_logits = tf.where(cond, -y_pred, y_pred)
-    entropy = tf.math.add(
-        relu_logits - y_pred * seg,
-        tf.math.log1p(tf.math.exp(neg_abs_logits)),
-        name=None,
-    )
-
-    return K.mean(tf.multiply(weight, entropy), axis=-1)
-
-
 def visualize(imgs, pred):
     fig = plt.figure(figsize=(15, 10))
     columns = 2
@@ -330,6 +203,7 @@ def learning_curves(train, val):
     ax.set_xlabel("Epoch", fontsize=14)
     fig.savefig("plots/plot.png")
     plt.close(fig)
+
 
 def get_args():
     """

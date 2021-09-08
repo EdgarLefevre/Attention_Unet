@@ -70,8 +70,8 @@ class Dataset(keras.utils.Sequence):
                 # img = np.array(io.imread(path)) / 255
             except Exception as e:
                 print(path)
-            # if self.contrast:
-            #     img = contrast_and_reshape(img)
+            if self.contrast:
+                img = contrast_and_reshape(img)
             x[j] = np.expand_dims(img, 2)
 
         y = np.zeros(
